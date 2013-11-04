@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 
 namespace ProgComp2013
@@ -81,6 +83,41 @@ namespace ProgComp2013
             }
 
             return score / Math.Max(10000, moves);
+        }
+
+        /// <summary>
+        /// Generates an image representing this route.
+        /// </summary>
+        /// <returns>An image generated from this route.</returns>
+        public Image ToImage(Map map)
+        {
+            var bmp = new Bitmap(Map.Width * 3, Map.Height * 3);
+            using (var ctx = Graphics.FromImage(bmp)) {
+                var agent = new Agent(map, this);
+                var pen = new Pen(new SolidBrush(Color.FromArgb(64, 255, 0, 0)));
+
+                ctx.InterpolationMode = InterpolationMode.NearestNeighbor;
+                ctx.DrawImage(map.ToImage(), new Rectangle(0, 0, Map.Width * 3, Map.Height * 3),
+                    -1f / 3f, -1f / 3f, Map.Width, Map.Height, GraphicsUnit.Pixel);
+
+                var lastPos = new Point(agent.X * 3 + 1, agent.Y * 3 + 1);
+                while (agent.MoveNext()) {
+                    var nextPos = new Point(agent.X * 3 + 1, agent.Y * 3 + 1);
+                    ctx.DrawLine(pen, lastPos, nextPos);
+                    lastPos = nextPos;
+                }
+            }
+
+            return bmp;
+        }
+
+        /// <summary>
+        /// Converts the route into a sequence of N, S, E and W characters.
+        /// </summary>
+        /// <returns>A sequence of characters representing this route.</returns>
+        public override string ToString()
+        {
+            return new String(_dirs.Select(x => x.ToString()[0]).ToArray());
         }
     }
 }

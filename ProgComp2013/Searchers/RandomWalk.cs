@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace ProgComp2013.Searchers
 {
+    /// <summary>
+    /// I think this is our best bet.
+    /// </summary>
     public class RandomWalk : IterativeSearcher
     {
         private Random _rand = new Random();

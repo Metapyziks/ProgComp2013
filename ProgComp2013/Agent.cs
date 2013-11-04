@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ProgComp2013
 {
@@ -9,8 +10,6 @@ namespace ProgComp2013
     public class Agent : IEnumerator<Direction>
     {
         private IEnumerator<Direction> _dirs;
-        private Map _originalMap;
-
         private Map _workingMap;
 
         /// <summary>
@@ -46,9 +45,12 @@ namespace ProgComp2013
         public Agent(Map map, IEnumerator<Direction> dirIter)
         {
             _dirs = dirIter;
-            _originalMap = map;
+            _workingMap = map.Clone();
 
-            Reset();
+            X = 0;
+            Y = 0;
+
+            Score = 0.0;
         }
 
         /// <summary>
@@ -91,16 +93,9 @@ namespace ProgComp2013
             }
         }
 
-        /// <summary>
-        /// Resets the agent to its initial state.
-        /// </summary>
         public void Reset()
         {
-            _dirs.Reset();
-
-            _workingMap = _originalMap.Clone();
-
-            Score = 0.0;
+            throw new NotSupportedException();
         }
 
         /// <summary>
