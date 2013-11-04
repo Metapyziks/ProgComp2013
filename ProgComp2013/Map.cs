@@ -41,6 +41,8 @@ namespace ProgComp2013
         public const int Height = 100;
 
         private readonly double[,] _data;
+
+        private readonly double _min;
         private readonly double _max;
 
         public double this[int x, int y]
@@ -52,7 +54,11 @@ namespace ProgComp2013
         {
             _data = data;
 
+            _min = double.MaxValue;
+            _max = double.MinValue;
+
             foreach (var val in _data) {
+                if (val < _min) _min = val;
                 if (val > _max) _max = val;
             }
         }
@@ -62,7 +68,7 @@ namespace ProgComp2013
             var bmp = new Bitmap(Width, Height);
             for (var x = 0; x < Width; ++x) {
                 for (var y = 0; y < Height; ++y) {
-                    byte clr = (byte) Math.Round((this[x, y] * 255.0) / _max);
+                    byte clr = (byte) Math.Round(((this[x, y] - _min) * 255.0) / (_max - _min));
                     bmp.SetPixel(x, y, Color.FromArgb(clr, clr, clr));
                 }
             }
