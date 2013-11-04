@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProgComp2013
 {
-    class Map
+    public class Map
     {
         public static Map FromFile(String path)
         {
@@ -22,12 +23,13 @@ namespace ProgComp2013
 
         public static Map FromString(String str)
         {
-            var rawData = str.Split('\n').Select(x => x.Split(',').Select(y => double.Parse(y)).ToArray()).ToArray();
+            var lines = str.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var rawData = lines.Select(x => x.Split(',').Select(y => double.Parse(y)).ToArray()).ToArray();
             double[,] data = new double[Width, Height];
 
             for (int x = 0; x < Width; ++x) {
                 for (int y = 0; y < Height; ++y) {
-                    data[x, y] = rawData[x][y];
+                    data[x, y] = rawData[y][x];
                 }
             }
 
@@ -47,6 +49,18 @@ namespace ProgComp2013
         private Map(double[,] data)
         {
             _data = data;
+        }
+
+        public Image ToImage()
+        {
+            var bmp = new Bitmap(Width, Height);
+            for (var x = 0; x < Width; ++x) {
+                for (var y = 0; y < Height; ++y) {
+                    byte clr = (byte) Math.Round((this[x,y] * 255.0) / 100.0);
+                    bmp.SetPixel(x, y, Color.FromArgb(clr, clr, clr));
+                }
+            }
+            return bmp;
         }
     }
 }
