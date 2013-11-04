@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProgComp2013
 {
@@ -15,16 +11,16 @@ namespace ProgComp2013
         West = 4
     }
 
-    public class Path : IEnumerable<Direction>
+    public class Route : IEnumerable<Direction>
     {
         private List<Direction> _dirs;
 
-        public Path()
+        public Route()
         {
             _dirs = new List<Direction>();
         }
 
-        public Path(IEnumerable<Direction> dirs)
+        public Route(IEnumerable<Direction> dirs)
         {
             _dirs = dirs.ToList();
         }
@@ -42,6 +38,18 @@ namespace ProgComp2013
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _dirs.GetEnumerator();
+        }
+
+        public double CalculateScore(Map map)
+        {
+            var agent = new Agent(map, this);
+            double score = 0.0;
+
+            while (agent.MoveNext()) {
+                score += agent.Score;
+            }
+
+            return score;
         }
     }
 }

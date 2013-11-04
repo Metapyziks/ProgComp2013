@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ProgComp2013
 {
@@ -18,7 +13,6 @@ namespace ProgComp2013
         public int Y { get; private set; }
 
         public double Score { get; private set; }
-        public double Probability { get; private set; }
 
         public Agent(Map map, IEnumerable<Direction> dirs)
         {
@@ -50,8 +44,7 @@ namespace ProgComp2013
             X += normal.X;
             Y += normal.Y;
 
-            Probability += _workingMap[X, Y];
-            Score += Probability;
+            Score += _workingMap[X, Y];
         }
 
         public bool MoveNext()
@@ -71,7 +64,6 @@ namespace ProgComp2013
             _workingMap = _originalMap.Clone();
 
             Score = 0.0;
-            Probability = 0.0;
         }
     }
 }
