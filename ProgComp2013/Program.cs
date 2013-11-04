@@ -12,7 +12,7 @@ namespace ProgComp2013
                 args = new String[] { Path.Combine("..", "..", "..", "maps", "map01.map") };
             }
 
-            var searcher = new RandomWalk();
+            var searcher = new RowScan();
 
             foreach (var arg in args) {
                 var name = Path.GetFileNameWithoutExtension(arg);

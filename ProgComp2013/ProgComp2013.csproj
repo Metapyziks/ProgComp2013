@@ -50,6 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ISearcher.cs" />
     <Compile Include="Searchers\RandomWalk.cs" />
+    <Compile Include="Searchers\RowScan.cs" />
     <Compile Include="Tools.cs" />
   </ItemGroup>
   <ItemGroup>
