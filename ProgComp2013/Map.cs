@@ -48,6 +48,7 @@ namespace ProgComp2013
         public double this[int x, int y]
         {
             get { return _data[x, y]; }
+            set { _data[x, y] = value; }
         }
 
         private Map(double[,] data)
@@ -61,6 +62,11 @@ namespace ProgComp2013
                 if (val < _min) _min = val;
                 if (val > _max) _max = val;
             }
+        }
+
+        public Map Clone()
+        {
+            return new Map((double[,]) _data.Clone());
         }
 
         public Image ToImage()
