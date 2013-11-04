@@ -2,6 +2,6 @@
 {
     public interface ISearcher
     {
-        Route Search(Map map);
+        Route Search(Map map, int maxLength);
     }
 }
