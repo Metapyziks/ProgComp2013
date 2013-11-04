@@ -49,6 +49,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ISearcher.cs" />
+    <Compile Include="Searchers\Greedy.cs" />
     <Compile Include="Searchers\RandomWalk.cs" />
     <Compile Include="Searchers\RowScan.cs" />
     <Compile Include="Tools.cs" />

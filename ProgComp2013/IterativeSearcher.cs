@@ -23,7 +23,7 @@ namespace ProgComp2013
         /// <returns>The direction the agent should move next step.</returns>
         protected abstract Direction Next(Agent agent);
 
-        private IEnumerator<Direction> Enumerator()
+        private IEnumerator<Direction> Enumerator(Map map)
         {
             for(;;) {
                 var dir = Next(_agent);
@@ -41,7 +41,7 @@ namespace ProgComp2013
         /// <returns>A route that traverses the given map.</returns>
         public Route Search(Map map, int maxLength = Map.Width * Map.Height)
         {
-            _agent = new Agent(map, Enumerator());
+            _agent = new Agent(map, Enumerator(map));
 
             OnBegin();
 

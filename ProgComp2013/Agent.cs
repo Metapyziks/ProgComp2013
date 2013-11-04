@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace ProgComp2013
 {
@@ -10,7 +11,6 @@ namespace ProgComp2013
     public class Agent : IEnumerator<Direction>
     {
         private IEnumerator<Direction> _dirs;
-        private Map _workingMap;
 
         /// <summary>
         /// Current horizontal position of the agent.
@@ -26,6 +26,11 @@ namespace ProgComp2013
         /// Current accumulated probability of the agent.
         /// </summary>
         public double Score { get; private set; }
+
+        /// <summary>
+        /// Map representing the probabilities of unvisited areas.
+        /// </summary>
+        public Map WorkingMap { get; private set; }
 
         /// <summary>
         /// Creates a new agent that follows the specified route
@@ -45,7 +50,7 @@ namespace ProgComp2013
         public Agent(Map map, IEnumerator<Direction> dirIter)
         {
             _dirs = dirIter;
-            _workingMap = map.Clone();
+            WorkingMap = map.Clone();
 
             X = 0;
             Y = 0;
@@ -73,9 +78,9 @@ namespace ProgComp2013
             X += normal.X;
             Y += normal.Y;
 
-            Score += _workingMap[X, Y];
+            Score += WorkingMap[X, Y];
 
-            _workingMap[X, Y] = 0.0;
+            WorkingMap[X, Y] = 0.0;
         }
 
         /// <summary>
@@ -96,6 +101,32 @@ namespace ProgComp2013
         public void Reset()
         {
             throw new NotSupportedException();
+        }
+
+        public Direction GetDirection(Point pos)
+        {
+            int dx = pos.X - X;
+            int dy = pos.Y - Y;
+
+            if (Math.Abs(dx) >= Math.Abs(dy)) {
+                if (dx > 0) return Direction.East;
+                else return Direction.West;
+            } else {
+                if (dy > 0) return Direction.South;
+                else return Direction.North;
+            }
+        }
+
+        public IEnumerable<Point> GetNeighbours(int radius)
+        {
+            for (int i = 0; i < radius << 2; ++i) {
+                int x = X - radius + (i + 1) / 2;
+                int y = Y + (radius - Math.Abs(X - x)) * (((i & 1) << 1) - 1);
+
+                if (x < 0 || y < 0 || x >= Map.Width || y >= Map.Height) continue;
+
+                yield return new Point(x, y);
+            }
         }
 
         /// <summary>
