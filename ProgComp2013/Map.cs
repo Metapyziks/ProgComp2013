@@ -27,9 +27,10 @@ namespace ProgComp2013
             var rawData = lines.Select(x => x.Split(',').Select(y => double.Parse(y)).ToArray()).ToArray();
             double[,] data = new double[Width, Height];
 
+            double sum = rawData.Sum(x => x.Sum());
             for (int x = 0; x < Width; ++x) {
                 for (int y = 0; y < Height; ++y) {
-                    data[x, y] = rawData[y][x];
+                    data[x, y] = rawData[y][x] / sum;
                 }
             }
 
@@ -39,7 +40,8 @@ namespace ProgComp2013
         public const int Width = 100;
         public const int Height = 100;
 
-        private double[,] _data;
+        private readonly double[,] _data;
+        private readonly double _max;
 
         public double this[int x, int y]
         {
@@ -49,6 +51,10 @@ namespace ProgComp2013
         private Map(double[,] data)
         {
             _data = data;
+
+            foreach (var val in _data) {
+                if (val > _max) _max = val;
+            }
         }
 
         public Image ToImage()
@@ -56,7 +62,7 @@ namespace ProgComp2013
             var bmp = new Bitmap(Width, Height);
             for (var x = 0; x < Width; ++x) {
                 for (var y = 0; y < Height; ++y) {
-                    byte clr = (byte) Math.Round((this[x,y] * 255.0) / 100.0);
+                    byte clr = (byte) Math.Round((this[x, y] * 255.0) / _max);
                     bmp.SetPixel(x, y, Color.FromArgb(clr, clr, clr));
                 }
             }
