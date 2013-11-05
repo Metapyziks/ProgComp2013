@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProgComp2013.Searchers
 {
@@ -43,7 +41,7 @@ namespace ProgComp2013.Searchers
 
             if (bestDir == Direction.None) {
                 for (int r = 1; r < Map.Width; ++r) {
-                    foreach (var pos in agent.GetNeighbours(r)) {
+                    foreach (var pos in agent.Pos.GetNeighbours(r)) {
                         var score = agent.WorkingMap[pos.X, pos.Y]
                             / (Math.Abs(pos.X - agent.X) + Math.Abs(pos.Y - agent.Y));
                         if (score > bestScore) {

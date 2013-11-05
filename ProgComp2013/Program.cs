@@ -17,7 +17,8 @@ namespace ProgComp2013
 
             var searchers = new ISearcher[] {
                 new RowScan(),
-                new Greedy()
+                new Greedy(),
+                new FlowMap()
             };
 
             foreach (var arg in args) {
@@ -26,7 +27,7 @@ namespace ProgComp2013
 
                 foreach (var searcher in searchers) {
                     Console.WriteLine("Running {0} on {1}", searcher.GetType().Name, name);
-                    var route = searcher.Search(map, Map.Width * Map.Height);
+                    var route = searcher.Search(map, Map.Width * Map.Height / 2);
                     var fileName = String.Format("{0}.{1}", name, searcher.GetType().Name.ToLower());
 
                     Console.WriteLine("Score: {0}", route.CalculateScore(map));

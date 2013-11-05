@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace ProgComp2013
 {
@@ -26,6 +28,25 @@ namespace ProgComp2013
                     return new Point(-1, 0);
                 default:
                     return new Point();
+            }
+        }
+
+        public static Point GetNeighbour(this Point pos, Direction dir)
+        {
+            var newPos = pos;
+            pos.Offset(dir.Normal());
+            return pos;
+        }
+
+        public static IEnumerable<Point> GetNeighbours(this Point pos, int radius)
+        {
+            for (int i = 0; i < radius << 2; ++i) {
+                int x = pos.X - radius + (i + 1) / 2;
+                int y = pos.Y + (radius - Math.Abs(pos.X - x)) * (((i & 1) << 1) - 1);
+
+                if (x < 0 || y < 0 || x >= Map.Width || y >= Map.Height) continue;
+
+                yield return new Point(x, y);
             }
         }
     }

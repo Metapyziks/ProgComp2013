@@ -23,6 +23,11 @@ namespace ProgComp2013
         public int Y { get; private set; }
 
         /// <summary>
+        /// Current combined position of the agent.
+        /// </summary>
+        public Point Pos { get { return new Point(X, Y); } }
+
+        /// <summary>
         /// Current accumulated probability of the agent.
         /// </summary>
         public double Score { get; private set; }
@@ -114,18 +119,6 @@ namespace ProgComp2013
             } else {
                 if (dy > 0) return Direction.South;
                 else return Direction.North;
-            }
-        }
-
-        public IEnumerable<Point> GetNeighbours(int radius)
-        {
-            for (int i = 0; i < radius << 2; ++i) {
-                int x = X - radius + (i + 1) / 2;
-                int y = Y + (radius - Math.Abs(X - x)) * (((i & 1) << 1) - 1);
-
-                if (x < 0 || y < 0 || x >= Map.Width || y >= Map.Height) continue;
-
-                yield return new Point(x, y);
             }
         }
 
