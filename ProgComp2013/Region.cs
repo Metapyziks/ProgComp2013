@@ -23,12 +23,14 @@ namespace ProgComp2013
 
         public static IEnumerable<Region> FromMap(Map map)
         {
-            var tiles = new SortedList<double, Point>();
+            var tiles = new List<Point>();
             for (int x = 0; x < Map.Width; ++x) {
                 for (int y = 0; y < Map.Height; ++y) {
-                    tiles.Add(-map[x, y], new Point(x, y));
+                    tiles.Add(new Point(x, y));
                 }
             }
+
+            tiles.Sort(Comparer<Point>.Create((a, b) => Math.Sign(map[b.X, b.Y] - map[a.X, a.Y])));
 
             var regions = new List<Region>();
 
@@ -43,7 +45,7 @@ namespace ProgComp2013
                 while (groupTiles.Count > 0) {
                     var group = new List<Point>();
                     Flood(groupTiles.First(), groupTiles, group);
-                    regions.Add(group);
+                    regions.Add(new Region(map, group.ToArray()));
                 }
             }
 
@@ -60,6 +62,25 @@ namespace ProgComp2013
         {
             _tiles = tiles;
             Score = _tiles.Sum(x => map[x.X, x.Y]);
+        }
+        
+        public Image ToImage()
+        {
+            return ToImage(Color.Blue);
+        }
+
+        public Image ToImage(Color clr)
+        {
+            var bmp = new Bitmap(Map.Width, Map.Height);
+            using (var ctx = Graphics.FromImage(bmp)) {
+                ctx.Clear(Color.Transparent);
+            }
+
+            foreach (var point in _tiles) {
+                bmp.SetPixel(point.X, point.Y, clr);
+            }
+
+            return bmp;
         }
     }
 }

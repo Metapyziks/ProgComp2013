@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using ProgComp2013.Searchers;
+using System.Drawing;
 
 namespace ProgComp2013
 {
@@ -15,11 +16,36 @@ namespace ProgComp2013
                     String.Format("map{0:00}.map", x))).ToArray();
             }
 
-            var searchers = Enumerable.Range(1, 10).Select(x => new FlowMap { Power = x });
+            var searchers = new ISearcher[0];
+                //Enumerable.Range(1, 10).Select(x => new FlowMap { Power = x });
 
             foreach (var arg in args) {
                 var name = Path.GetFileNameWithoutExtension(arg);
                 var map = Map.FromFile(arg);
+
+                var regions = Region.FromMap(map);
+                var regionMap = new Bitmap(Map.Width, Map.Height);
+
+                var clrs = new[] {
+                    Color.Blue,
+                    Color.CornflowerBlue,
+                    Color.Salmon,
+                    Color.SeaShell,
+                    Color.Goldenrod,
+                    Color.Fuchsia,
+                    Color.Lavender,
+                    Color.Green
+                };
+
+                using (var ctx = Graphics.FromImage(regionMap)) {
+                    int i = 0;
+                    foreach (var region in regions) {
+                        var img = region.ToImage(clrs[(i++) & 7]);
+                        ctx.DrawImageUnscaled(img, Point.Empty);
+                    }
+                }
+
+                regionMap.Save(String.Format("region{0}.png", name));
                 
                 var bestName = String.Format("{0}.txt", name);
                 var bestScore = 0.0;
