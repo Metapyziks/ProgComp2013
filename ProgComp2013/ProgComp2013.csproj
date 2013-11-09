@@ -45,6 +45,7 @@
     <Compile Include="Agent.cs" />
     <Compile Include="IterativeSearcher.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="Region.cs" />
     <Compile Include="Route.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

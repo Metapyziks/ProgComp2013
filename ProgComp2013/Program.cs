@@ -20,16 +20,37 @@ namespace ProgComp2013
             foreach (var arg in args) {
                 var name = Path.GetFileNameWithoutExtension(arg);
                 var map = Map.FromFile(arg);
+                
+                var bestName = String.Format("{0}.txt", name);
+                var bestScore = 0.0;
+                Route best;
+
+                if (File.Exists(bestName)) {
+                    best = Route.FromFile(bestName);
+                    bestScore = best.CalculateScore(map);
+                    Console.WriteLine("Current best score: {0}", bestScore);
+                }
 
                 foreach (var searcher in searchers) {
                     Console.WriteLine("Running {0} on {1}", searcher.GetName(), name);
                     var route = searcher.Search(map, Map.Width * Map.Height / 2);
                     var fileName = String.Format("{0}.{1}", name, searcher.GetName().ToLower());
-
-                    Console.WriteLine("Score: {0}", route.CalculateScore(map));
+                    var score = route.CalculateScore(map);
+                    Console.WriteLine("Score: {0}", score);
 
                     File.WriteAllText(String.Format("{0}.txt", fileName), route.ToString());
                     route.ToImage(map).Save(String.Format("{0}.png", fileName));
+
+                    if (score > bestScore) {
+                        bestScore = score;
+
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("New best score!");
+                        Console.ResetColor();
+
+                        File.WriteAllText(bestName, route.ToString());
+                        route.ToImage(map).Save(bestName.Replace(".txt", ".png"));
+                    }
                 }
 
                 Console.WriteLine("================");
