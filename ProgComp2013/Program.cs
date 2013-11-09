@@ -16,7 +16,7 @@ namespace ProgComp2013
                     String.Format("map{0:00}.map", x))).ToArray();
             }
 
-            var searchers = new [] { new RegionSearch() };
+            var searchers = new ISearcher[] { new RegionSearch(), new Greedy()};
                 //Enumerable.Range(1, 10).Select(x => new FlowMap { Power = x });
 
             foreach (var arg in args) {
@@ -26,21 +26,15 @@ namespace ProgComp2013
                 var regions = Region.FromMap(map);
                 var regionMap = new Bitmap(Map.Width, Map.Height);
 
-                var clrs = new[] {
-                    Color.Blue,
-                    Color.CornflowerBlue,
-                    Color.Salmon,
-                    Color.SeaShell,
-                    Color.Goldenrod,
-                    Color.Fuchsia,
-                    Color.Lavender,
-                    Color.Green
-                };
+                var clrs = Enumerable.Range(0, 8)
+                    .Select(x => (x * 255) / 7)
+                    .Select(x => Color.FromArgb(255 - x, 0, x))
+                    .ToArray();
 
                 using (var ctx = Graphics.FromImage(regionMap)) {
                     int i = 0;
                     foreach (var region in regions) {
-                        var img = region.ToImage(clrs[(i++) & 7]);
+                        var img = region.ToImage(clrs[region.Tier]);
                         ctx.DrawImageUnscaled(img, Point.Empty);
                     }
                 }
@@ -81,9 +75,6 @@ namespace ProgComp2013
 
                 Console.WriteLine("================");
             }
-
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
         }
     }
 }

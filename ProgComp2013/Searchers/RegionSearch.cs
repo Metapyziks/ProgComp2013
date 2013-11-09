@@ -8,14 +8,13 @@ namespace ProgComp2013.Searchers
 {
     public class RegionSearch : IterativeSearcher
     {
-        private static readonly IComparer<Region> _sRegionComp =
-            Comparer<Region>.Create((a, b) => Math.Sign(b.Score - a.Score));
-
         private List<Region> _regions;
+        private Region _curRegion;
 
         protected override void OnBegin()
-        {
+        {   
             _regions = null;
+            _curRegion = null;
         }
 
         protected override Direction Next(Agent agent)
@@ -28,14 +27,19 @@ namespace ProgComp2013.Searchers
             // and we can stop
             if (_regions.Count == 0) return Direction.None;
 
-            //_regions.Sort(_sRegionComp);
+            if (_curRegion == null || _curRegion.Count() == 0) {
+                var scoreDict = _regions.ToDictionary(x => x, x =>
+                x.Score - Math.Pow(x.Min(y => y.Distance(agent.Pos)), 0.4284172) / (Map.Width * Map.Height));
 
-            // Find highest scoring region from when they were originally
-            // calculated
-            var best = _regions.First();
+                _regions.Sort(Comparer<Region>.Create((a, b) => Math.Sign(scoreDict[b] - scoreDict[a])));
+
+                // Find highest scoring region from when they were originally
+                // calculated
+                _curRegion = _regions.First();
+            }
 
             // Find nearest tile in the best region
-            var nearest = best.OrderBy(x => x.Distance(agent.Pos))
+            var nearest = _curRegion.OrderBy(x => x.Distance(agent.Pos))
                 .Where(x => x != agent.Pos).First();
 
             var dir = agent.GetDirection(nearest);

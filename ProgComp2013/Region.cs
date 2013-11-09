@@ -67,8 +67,7 @@ namespace ProgComp2013
             if (_tiles.Count == 0) {
                 Score = 0.0;
             } else {
-                var avg = _tiles.Average(x => _map[x]);
-                Score = avg * _tiles.Count * _tiles.Count * 0.5;
+                Score = _tiles.Average(x => _map[x]);
             }
         }
 
