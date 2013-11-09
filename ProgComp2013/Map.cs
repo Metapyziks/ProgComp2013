@@ -82,6 +82,12 @@ namespace ProgComp2013
             set { _data[x, y] = value; }
         }
 
+        public double this[Point pos]
+        {
+            get { return _data[pos.X, pos.Y]; }
+            set { _data[pos.X, pos.Y] = value; }
+        }
+
         private Map(double[,] data)
         {
             _data = data;

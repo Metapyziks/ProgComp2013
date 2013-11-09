@@ -111,14 +111,26 @@ namespace ProgComp2013
             var bmp = new Bitmap(Map.Width * 3, Map.Height * 3);
             using (var ctx = Graphics.FromImage(bmp)) {
                 var agent = new Agent(map, this);
-                var pen = new Pen(new SolidBrush(Color.FromArgb(64, 255, 0, 0)));
+                var initClr = Color.Red;
+                var finlClr = Color.Green;
 
                 ctx.InterpolationMode = InterpolationMode.NearestNeighbor;
                 ctx.DrawImage(map.ToImage(), new Rectangle(0, 0, Map.Width * 3, Map.Height * 3),
                     -1f / 3f, -1f / 3f, Map.Width, Map.Height, GraphicsUnit.Pixel);
 
+                var length = this.Count();
+
                 var lastPos = new Point(agent.X * 3 + 1, agent.Y * 3 + 1);
+                int i = 0;
                 while (agent.MoveNext()) {
+                    var t = (i++ + 0.0) / length;
+                    var clr = Color.FromArgb(
+                        (byte) (initClr.R * (1.0 - t) + finlClr.R * t),
+                        (byte) (initClr.G * (1.0 - t) + finlClr.G * t),
+                        (byte) (initClr.B * (1.0 - t) + finlClr.B * t));
+
+                    var pen = new Pen(clr);
+
                     var nextPos = new Point(agent.X * 3 + 1, agent.Y * 3 + 1);
                     ctx.DrawLine(pen, lastPos, nextPos);
                     lastPos = nextPos;

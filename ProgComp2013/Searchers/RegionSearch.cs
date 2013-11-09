@@ -24,13 +24,33 @@ namespace ProgComp2013.Searchers
                 _regions = Region.FromMap(agent.WorkingMap).ToList();
             }
 
-            _regions.Sort(_sRegionComp);
+            // If there are no regions left, entire map is explored
+            // and we can stop
+            if (_regions.Count == 0) return Direction.None;
 
+            //_regions.Sort(_sRegionComp);
+
+            // Find highest scoring region from when they were originally
+            // calculated
             var best = _regions.First();
 
+            // Find nearest tile in the best region
             var nearest = best.OrderBy(x => x.Distance(agent.Pos))
                 .Where(x => x != agent.Pos).First();
-            return agent.GetDirection(nearest);
+
+            var dir = agent.GetDirection(nearest);
+            var nextPos = agent.Pos.GetNeighbour(dir);
+            var nextRegion = _regions.FirstOrDefault(x => x.Contains(nextPos));
+
+            if (nextRegion != null) {
+                nextRegion.Remove(nextPos);
+
+                if (nextRegion.Score == 0.0) {
+                    _regions.Remove(nextRegion);
+                }
+            }
+
+            return dir;
         }
     }
 }

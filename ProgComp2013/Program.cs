@@ -59,7 +59,7 @@ namespace ProgComp2013
 
                 foreach (var searcher in searchers) {
                     Console.WriteLine("Running {0} on {1}", searcher.GetName(), name);
-                    var route = searcher.Search(map, 50 /* Map.Width * Map.Height / 2*/);
+                    var route = searcher.Search(map, Map.Width * Map.Height);
                     var fileName = String.Format("{0}.{1}", name, searcher.GetName().ToLower());
                     var score = route.CalculateScore(map);
                     Console.WriteLine("Score: {0}", score);

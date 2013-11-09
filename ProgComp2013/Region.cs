@@ -45,7 +45,7 @@ namespace ProgComp2013
                 while (groupTiles.Count > 0) {
                     var group = new List<Point>();
                     Flood(groupTiles.First(), groupTiles, group);
-                    regions.Add(new Region(map, group.ToList()));
+                    regions.Add(new Region(map, group.ToList(), i));
                 }
             }
 
@@ -55,21 +55,66 @@ namespace ProgComp2013
         private Map _map;
         private List<Point> _tiles;
 
-        public int Area { get { return _tiles.Length; } }
+        public Rectangle Bounds { get; private set; }
+
+        public int Area { get { return _tiles.Count; } }
+        public int Tier { get; private set; }
 
         public double Score { get; private set; }
 
-        private Region(Map map, List<Point> tiles)
+        private void CalculateScore()
+        {
+            if (_tiles.Count == 0) {
+                Score = 0.0;
+            } else {
+                var avg = _tiles.Average(x => _map[x]);
+                Score = avg * _tiles.Count * _tiles.Count * 0.5;
+            }
+        }
+
+        private Region(Map map, List<Point> tiles, int tier)
         {
             _map = map;
             _tiles = tiles;
-            Score = _tiles.Sum(x => map[x.X, x.Y]);
+            Tier = tier;
+            CalculateScore();
+
+            bool first = true;
+            foreach (var tile in tiles) {
+                if (first) {
+                    Bounds = new Rectangle(tile.X, tile.Y, 1, 1);
+                    first = false;
+                    continue;
+                }
+
+                if (tile.X < Bounds.Left) {
+                    Bounds = new Rectangle(tile.X, Bounds.Y, Bounds.Right - tile.X, Bounds.Height);
+                } else if (tile.X >= Bounds.Right) {
+                    Bounds.Inflate(tile.X + 1 - Bounds.Right, 0);
+                }
+
+                if (tile.Y < Bounds.Top) {
+                    Bounds = new Rectangle(Bounds.X, tile.Y, Bounds.Width, Bounds.Bottom - tile.Y);
+                } else if (tile.X >= Bounds.Right) {
+                    Bounds.Inflate(0, tile.Y + 1 - Bounds.Bottom);
+                }
+            }
+        }
+
+        public bool QuickContains(Point pos)
+        {
+            if (pos.X < Bounds.Left || pos.Y < Bounds.Top
+                || pos.X >= Bounds.Right || pos.Y >= Bounds.Bottom) {
+                return false;
+            }
+
+            return _tiles.Contains(pos);
         }
 
         public void Remove(Point pos)
         {
             _tiles.Remove(pos);
-            Score -= _map[pos.X, pos.Y];
+            CalculateScore();
         }
         
         public Image ToImage()
