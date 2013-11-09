@@ -38,6 +38,11 @@ namespace ProgComp2013
             return pos;
         }
 
+        public static int Distance(this Point @this, Point @that)
+        {
+            return Math.Abs(@this.X - @that.X) + Math.Abs(@this.Y - @that.Y);
+        }
+
         public static IEnumerable<Point> GetNeighbours(this Point pos, int radius)
         {
             for (int i = 0; i < radius << 2; ++i) {

@@ -53,6 +53,7 @@
     <Compile Include="Searchers\FlowMap.cs" />
     <Compile Include="Searchers\Greedy.cs" />
     <Compile Include="Searchers\RandomWalk.cs" />
+    <Compile Include="Searchers\RegionSearch.cs" />
     <Compile Include="Searchers\RowScan.cs" />
     <Compile Include="Tools.cs" />
   </ItemGroup>
