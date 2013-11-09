@@ -25,7 +25,7 @@ namespace ProgComp2013
 
         private IEnumerator<Direction> Enumerator(Map map)
         {
-            for(;;) {
+            for (;;) {
                 var dir = Next(_agent);
                 if (dir == Direction.None) yield break;
                 yield return dir;
@@ -51,6 +51,11 @@ namespace ProgComp2013
             }
 
             return route;
+        }
+
+        public virtual string GetName()
+        {
+            return GetType().Name;
         }
     }
 }

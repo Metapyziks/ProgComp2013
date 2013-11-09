@@ -15,20 +15,16 @@ namespace ProgComp2013
                     String.Format("map{0:00}.map", x))).ToArray();
             }
 
-            var searchers = new ISearcher[] {
-                new RowScan(),
-                new Greedy(),
-                new FlowMap()
-            };
+            var searchers = Enumerable.Range(1, 10).Select(x => new FlowMap { Power = x });
 
             foreach (var arg in args) {
                 var name = Path.GetFileNameWithoutExtension(arg);
                 var map = Map.FromFile(arg);
 
                 foreach (var searcher in searchers) {
-                    Console.WriteLine("Running {0} on {1}", searcher.GetType().Name, name);
+                    Console.WriteLine("Running {0} on {1}", searcher.GetName(), name);
                     var route = searcher.Search(map, Map.Width * Map.Height / 2);
-                    var fileName = String.Format("{0}.{1}", name, searcher.GetType().Name.ToLower());
+                    var fileName = String.Format("{0}.{1}", name, searcher.GetName().ToLower());
 
                     Console.WriteLine("Score: {0}", route.CalculateScore(map));
 

@@ -10,23 +10,29 @@ namespace ProgComp2013.Searchers
     {
         private Random _rand = new Random();
 
+        public double Power { get; set; }
+
+        public FlowMap()
+        {
+            Power = 2.0;
+        }
+
         protected override Direction Next(Agent agent)
         {
-            var bestScore = 0.0;
-            var bestDir = Direction.None;
+            double[] scores = new double[4];
             for (int r = 1; r < Map.Width; ++r) {
-                foreach (var pos in agent.Pos.GetNeighbours(r)) {
-                    var score = agent.WorkingMap[pos.X, pos.Y]
-                        / (Math.Abs(pos.X - agent.X) + Math.Abs(pos.Y - agent.Y));
-                    if (score > bestScore) {
-                        bestDir = agent.GetDirection(pos);
-                        bestScore = score;
-                    }
+                foreach (var pos in agent.Pos.GetNeighbours(r)) {                    
+                    var dir = agent.GetDirection(pos);
+                    scores[(int) dir - 1] += agent.WorkingMap[pos.X, pos.Y] / Math.Pow(r, Power);
                 }
-                if (bestScore > 0) break;
             }
 
-            return bestDir;
+            return (Direction) (Array.IndexOf(scores, scores.Max()) + 1);
+        }
+
+        public override string GetName()
+        {
+            return String.Format("{0}{1}", base.GetName(), Power);
         }
     }
 }

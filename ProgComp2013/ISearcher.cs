@@ -7,5 +7,6 @@
     public interface ISearcher
     {
         Route Search(Map map, int maxLength);
+        string GetName();
     }
 }
