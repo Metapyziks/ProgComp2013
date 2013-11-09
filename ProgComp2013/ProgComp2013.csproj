@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
+    <Compile Include="HomePage.cs" />
     <Compile Include="IterativeSearcher.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Region.cs" />
@@ -59,6 +60,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebServer\WebServer.csproj">
+      <Project>{a277a44e-6db6-481b-898e-2fd621161def}</Project>
+      <Name>WebServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

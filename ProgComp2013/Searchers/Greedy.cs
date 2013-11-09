@@ -8,6 +8,12 @@ namespace ProgComp2013.Searchers
     public class Greedy : IterativeSearcher
     {
         private Random _rand = new Random();
+        private double _error;
+
+        public Greedy(double error = 0.0)
+        {
+            _error = error;
+        }
 
         private double GetScore(Agent agent, Direction dir)
         {
@@ -33,7 +39,7 @@ namespace ProgComp2013.Searchers
             
             foreach (var dir in dirs) {
                 var score = GetScore(agent, dir);
-                if (score > bestScore) {
+                if (score > bestScore && _rand.NextDouble() >= _error) {
                     bestDir = dir;
                     bestScore = score;
                 }
@@ -54,6 +60,11 @@ namespace ProgComp2013.Searchers
             }
 
             return bestDir;
+        }
+
+        public override string GetName()
+        {
+            return String.Format("{0}-{1}", base.GetName(), (int) (_error * 1000));
         }
     }
 }

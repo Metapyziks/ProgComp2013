@@ -3,11 +3,19 @@ using System.IO;
 using System.Linq;
 using ProgComp2013.Searchers;
 using System.Drawing;
+using WebServer;
+using System.Reflection;
+using System.Threading;
 
 namespace ProgComp2013
 {
     class Program
     {
+        public static String[] MapNames { get; private set; }
+        public static DateTime[] LastUpdates { get; private set; }
+        public static String[] Methods { get; private set; }
+        public static double[] BestScores { get; private set; }
+
         static void Main(string[] args)
         {
             if (args.Length == 0) {
@@ -16,65 +24,85 @@ namespace ProgComp2013
                     String.Format("map{0:00}.map", x))).ToArray();
             }
 
-            var searchers = new ISearcher[] { new RegionSearch(), new Greedy()};
-                //Enumerable.Range(1, 10).Select(x => new FlowMap { Power = x });
+            MapNames = args.Select(x => Path.GetFileNameWithoutExtension(x)).ToArray();
 
-            foreach (var arg in args) {
-                var name = Path.GetFileNameWithoutExtension(arg);
-                var map = Map.FromFile(arg);
+            var maps = args.ToDictionary(x => x, x => Map.FromFile(x));
+            var bestRoutes = new Route[MapNames.Length];
+            LastUpdates = new DateTime[MapNames.Length];
+            Methods = new String[MapNames.Length];
+            BestScores = new double[MapNames.Length];
 
-                var regions = Region.FromMap(map);
-                var regionMap = new Bitmap(Map.Width, Map.Height);
+            var resDir = Path.Combine("..", "..", "..", "res");
 
-                var clrs = Enumerable.Range(0, 8)
-                    .Select(x => (x * 255) / 7)
-                    .Select(x => Color.FromArgb(255 - x, 0, x))
-                    .ToArray();
-
-                using (var ctx = Graphics.FromImage(regionMap)) {
-                    int i = 0;
-                    foreach (var region in regions) {
-                        var img = region.ToImage(clrs[region.Tier]);
-                        ctx.DrawImageUnscaled(img, Point.Empty);
-                    }
-                }
-
-                regionMap.Save(String.Format("region{0}.png", name));
-                
-                var bestName = String.Format("{0}.txt", name);
-                var bestScore = 0.0;
-                Route best;
-
+            for (int i = 0; i < args.Length; ++i) {
+                var name = MapNames[i];
+                var path = Path.Combine(resDir, name);
+                var bestName = String.Format("{0}.txt", path);
                 if (File.Exists(bestName)) {
-                    best = Route.FromFile(bestName);
-                    bestScore = best.CalculateScore(map);
-                    Console.WriteLine("Current best score: {0}", bestScore);
+                    bestRoutes[i] = Route.FromFile(bestName, out Methods[i], out LastUpdates[i]);
+                    BestScores[i] = bestRoutes[i].CalculateScore(maps[args[i]]);
+                } else {
+                    bestRoutes[i] = null;
+                    BestScores[i] = 0.0;
                 }
+            }
+            
+            if (!Directory.Exists(resDir)) {
+                Directory.CreateDirectory(resDir);
+            }
 
-                foreach (var searcher in searchers) {
-                    Console.WriteLine("Running {0} on {1}", searcher.GetName(), name);
-                    var route = searcher.Search(map, Map.Width * Map.Height);
-                    var fileName = String.Format("{0}.{1}", name, searcher.GetName().ToLower());
-                    var score = route.CalculateScore(map);
-                    Console.WriteLine("Score: {0}", score);
+            var server = new Server();
 
-                    File.WriteAllText(String.Format("{0}.txt", fileName), route.ToString());
-                    route.ToImage(map).Save(String.Format("{0}.png", fileName));
+            new Thread(() => {
+                var searchers = new[] { new Greedy(0.02), new Greedy(0.015), new Greedy(0.01), new Greedy(0.05) };
 
-                    if (score > bestScore) {
-                        bestScore = score;
+                while (!server.IsListening) Thread.Sleep(10);
+                
+                while (server.IsListening) {
+                    int r = 0;
+                    foreach (var arg in args) {
+                        var name = Path.GetFileNameWithoutExtension(arg);
+                        var path = Path.Combine(resDir, name);
+                        var map = maps[arg];
 
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("New best score!");
-                        Console.ResetColor();
+                        var bestName = String.Format("{0}.txt", path);
+                        var bestScore = BestScores[r];
 
-                        File.WriteAllText(bestName, route.ToString());
-                        route.ToImage(map).Save(bestName.Replace(".txt", ".png"));
+                        int passes = 10;
+                        foreach (var searcher in searchers) {
+                            for (int i = 0; i < passes; ++i) {
+                                var route = searcher.Search(map, Map.Width * Map.Height);
+                                var score = route.CalculateScore(map);
+
+                                if (score > bestScore) {
+                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                    Console.WriteLine("New best score for {0} at {1}!", name, DateTime.Now);
+                                    Console.WriteLine("+{0}", score - bestScore);
+                                    Console.ResetColor();
+                                    
+                                    bestScore = score;
+                                    bestRoutes[r] = route;
+                                    BestScores[r] = score;
+                                    Methods[r] = searcher.GetName();
+                                    LastUpdates[r] = DateTime.Now;
+
+                                    File.WriteAllText(bestName, String.Concat(searcher.GetName(), ", ",
+                                        DateTime.Now.ToString(), Environment.NewLine, route.ToString()));
+                                    route.ToImage(map).Save(bestName.Replace(".txt", ".png"));
+                                }
+                            }
+                        }
+
+                        ++r;
                     }
                 }
+            }).Start();
 
-                Console.WriteLine("================");
-            }
+            server.ResourceRootUrl = "/res";
+            DefaultResourceServlet.ResourceDirectory = resDir;
+            server.AddPrefix("http://+:80/");
+            server.BindServletsInAssembly(Assembly.GetExecutingAssembly());
+            server.Run();
         }
     }
 }

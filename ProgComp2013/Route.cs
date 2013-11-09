@@ -26,7 +26,18 @@ namespace ProgComp2013
     {
         public static Route FromFile(String path)
         {
-            return FromString(File.ReadAllText(path));
+            return FromString(File.ReadAllLines(path)[1]);
+        }
+
+        public static Route FromFile(String path, out String how, out DateTime when)
+        {
+            var lines = File.ReadAllLines(path);
+            var info = lines[0].Split(',').Select(x => x.Trim()).ToArray();
+
+            how = info[0];
+            when = DateTime.Parse(info[1]);
+
+            return FromString(lines[1]);
         }
 
         public static Route FromString(String str)
