@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 
 namespace ProgComp2013
@@ -23,6 +24,22 @@ namespace ProgComp2013
     /// </summary>
     public class Route : IEnumerable<Direction>
     {
+        public static Route FromFile(String path)
+        {
+            return FromString(File.ReadAllText(path));
+        }
+
+        public static Route FromString(String str)
+        {
+            var dict = new Direction[] { Direction.North, Direction.South, Direction.East, Direction.West }
+                .SelectMany(x => new Dictionary<char, Direction> { 
+                    { x.ToString().ToUpper()[0], x },
+                    { x.ToString().ToLower()[0], x }
+                }).ToDictionary(x => x.Key, x => x.Value);
+
+            return new Route(str.Where(x => dict.ContainsKey(x)).Select(x => dict[x]));
+        }
+
         private List<Direction> _dirs;
 
         /// <summary>
