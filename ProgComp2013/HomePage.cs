@@ -26,17 +26,30 @@ namespace ProgComp2013
 
         private void Body()
         {
+            int cols = 3;
+            Write("<table>");
             for (int i = 0; i < Program.MapNames.Length; ++i) {
+                if (i % cols == 0) {
+                    Write("<tr>");
+                }
+
                 Write(
-                    Tag("h1")(Program.MapNames[i]),
-                    EmptyTag("img", src => String.Format("res/{0}.png", Program.MapNames[i])),
-                    Tag("p")(
-                        "Last Update: ", Program.LastUpdates[i], Ln,
-                        "Method: ", Program.Methods[i], Ln,
-                        "Score: ", Program.BestScores[i]
+                    Tag("td")(
+                        Tag("h1")(Program.MapNames[i]),
+                        EmptyTag("img", src => String.Format("res/{0}.png", Program.MapNames[i])),
+                        Tag("p")(
+                            "Last Update: ", Program.LastUpdates[i], Ln,
+                            "Method: ", Program.Methods[i], Ln,
+                            "Score: ", Program.BestScores[i]
+                        )
                     )
                 );
+
+                if (i % cols == cols - 1 || i == Program.MapNames.Length - 1) {
+                    Write("</tr>");
+                }
             }
+            Write("</table>");
         }
     }
 }

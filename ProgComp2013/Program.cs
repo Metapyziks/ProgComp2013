@@ -54,7 +54,7 @@ namespace ProgComp2013
             var server = new Server();
 
             new Thread(() => {
-                var searchers = new[] { new Greedy(0.02), new Greedy(0.015), new Greedy(0.01), new Greedy(0.05) };
+                var searchers = new[] { new Greedy(0.015), new Greedy(0.01), new Greedy(0.005), new Greedy(0.002) };
 
                 while (!server.IsListening) Thread.Sleep(10);
                 

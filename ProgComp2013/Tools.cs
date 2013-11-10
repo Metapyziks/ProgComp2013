@@ -9,6 +9,10 @@ namespace ProgComp2013
     /// </summary>
     public static class Tools
     {
+        public static readonly Direction[] AllDirs = new[] {
+            Direction.North, Direction.East, Direction.South, Direction.West
+        };
+
         /// <summary>
         /// Finds the position offset that would be the result of
         /// travelling in the specified direction.

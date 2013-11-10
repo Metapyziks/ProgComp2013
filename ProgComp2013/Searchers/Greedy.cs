@@ -9,6 +9,8 @@ namespace ProgComp2013.Searchers
     {
         private Random _rand = new Random();
         private double _error;
+        private Region _initialRegion;
+        private bool _visitedInitialRegion;
 
         public Greedy(double error = 0.0)
         {
@@ -23,8 +25,34 @@ namespace ProgComp2013.Searchers
             return agent.WorkingMap[pos.X, pos.Y];
         }
 
+        protected override void OnBegin()
+        {
+            _initialRegion = null;
+        }
+
         protected override Direction Next(Agent agent)
         {
+            if (_initialRegion == null) {
+                _initialRegion = Region.FromMap(agent.WorkingMap)
+                    .Where(x => x.Tier == 0)
+                    .OrderByDescending(x => x.Area * _rand.NextDouble())
+                    .First();
+
+                _visitedInitialRegion = _rand.NextDouble() < 0.25;
+            }
+            
+            if (!_visitedInitialRegion) {
+                _visitedInitialRegion = _initialRegion.Contains(agent.Pos);
+            }
+
+            if (!_visitedInitialRegion) {
+                var nearest = _initialRegion
+                    .OrderBy(x => x.Distance(agent.Pos))
+                    .First();
+
+                return agent.GetDirection(nearest);
+            }
+
             var dirs = new List<Direction>();
 
             if (agent.X > 0) dirs.Add(Direction.West);
@@ -32,34 +60,36 @@ namespace ProgComp2013.Searchers
             if (agent.X < Map.Width - 1) dirs.Add(Direction.East);
             if (agent.Y < Map.Height - 1) dirs.Add(Direction.South);
 
-            dirs = dirs.OrderBy(x => _rand.Next()).ToList();
+            dirs = dirs
+                .Where(x => GetScore(agent, x) > 0.0)
+                .OrderBy(x => _rand.Next())
+                .OrderByDescending(x => GetScore(agent, x))
+                .ToList();
 
-            var bestDir = Direction.None;
-            var bestScore = 0.0;
-            
-            foreach (var dir in dirs) {
-                var score = GetScore(agent, dir);
-                if (score > bestScore && _rand.NextDouble() >= _error) {
-                    bestDir = dir;
-                    bestScore = score;
-                }
-            }
-
-            if (bestDir == Direction.None) {
+            if (dirs.Count == 0) {
                 for (int r = 1; r < Map.Width; ++r) {
-                    foreach (var pos in agent.Pos.GetNeighbours(r)) {
-                        var score = agent.WorkingMap[pos.X, pos.Y]
-                            / (Math.Abs(pos.X - agent.X) + Math.Abs(pos.Y - agent.Y));
-                        if (score > bestScore) {
-                            bestDir = agent.GetDirection(pos);
-                            bestScore = score;
-                        }
-                    }
-                    if (bestScore > 0) break;
+                    var scores = agent.Pos.GetNeighbours(r)
+                        .Select(x => Tuple.Create(agent.GetDirection(x), agent.WorkingMap[x]))
+                        .Where(x => x.Item2 > 0.0);
+
+                    dirs = Tools.AllDirs
+                        .Select(x => Tuple.Create(x, scores
+                            .Where(y => y.Item1 == x)
+                            .Sum(y => y.Item2)))
+                        .OrderByDescending(x => x.Item2)
+                        .Select(x => x.Item1).ToList();
                 }
             }
 
-            return bestDir;
+            if (dirs.Count == 0) {
+                return Direction.None;
+            }
+            
+            while (dirs.Count > 1 && _rand.NextDouble() < _error) {
+                dirs.RemoveAt(0);
+            }
+
+            return dirs.First();
         }
 
         public override string GetName()
