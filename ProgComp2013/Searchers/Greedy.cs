@@ -53,17 +53,18 @@ namespace ProgComp2013.Searchers
                 return agent.GetDirection(nearest);
             }
 
-            var dirs = new List<Direction>();
+            var validDirs = new List<Direction>();
 
-            if (agent.X > 0) dirs.Add(Direction.West);
-            if (agent.Y > 0) dirs.Add(Direction.North);
-            if (agent.X < Map.Width - 1) dirs.Add(Direction.East);
-            if (agent.Y < Map.Height - 1) dirs.Add(Direction.South);
+            if (agent.X > 0) validDirs.Add(Direction.West);
+            if (agent.Y > 0) validDirs.Add(Direction.North);
+            if (agent.X < Map.Width - 1) validDirs.Add(Direction.East);
+            if (agent.Y < Map.Height - 1) validDirs.Add(Direction.South);
 
-            dirs = dirs
-                .Where(x => GetScore(agent, x) > 0.0)
+            var dirs = validDirs
+                .Select(x => Tuple.Create(x, GetScore(agent, x)))
+                .Where(x => x.Item2 > 0.0)
                 .OrderBy(x => _rand.Next())
-                .OrderByDescending(x => GetScore(agent, x))
+                .OrderByDescending(x => x.Item2)
                 .ToList();
 
             if (dirs.Count == 0) {
@@ -72,24 +73,38 @@ namespace ProgComp2013.Searchers
                         .Select(x => Tuple.Create(agent.GetDirection(x), agent.WorkingMap[x]))
                         .Where(x => x.Item2 > 0.0);
 
-                    dirs = Tools.AllDirs
+                    if (scores.Count() == 0) continue;
+
+                    dirs = validDirs
                         .Select(x => Tuple.Create(x, scores
                             .Where(y => y.Item1 == x)
                             .Sum(y => y.Item2)))
                         .OrderByDescending(x => x.Item2)
-                        .Select(x => x.Item1).ToList();
+                        .ToList();
+
+                    break;
                 }
             }
 
             if (dirs.Count == 0) {
                 return Direction.None;
             }
-            
-            while (dirs.Count > 1 && _rand.NextDouble() < _error) {
-                dirs.RemoveAt(0);
-            }
 
-            return dirs.First();
+            dirs = dirs
+                .Select(x => Tuple.Create(x.Item1, Math.Pow(Math.E, x.Item2 * Map.Width * Map.Height * 4.0)))
+                .ToList();
+
+            var sum = dirs.Sum(x => x.Item2);
+            dirs = dirs
+                .Select(x => Tuple.Create(x.Item1, x.Item2 / sum))
+                .ToList();
+
+            var index = _rand.NextDouble();
+
+            sum = 0.0;
+            return dirs
+                .First(x => (sum += x.Item2) >= index)
+                .Item1;
         }
 
         public override string GetName()

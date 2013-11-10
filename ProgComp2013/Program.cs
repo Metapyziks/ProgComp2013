@@ -54,7 +54,7 @@ namespace ProgComp2013
             var server = new Server();
 
             new Thread(() => {
-                var searchers = new[] { new Greedy(0.015), new Greedy(0.01), new Greedy(0.005), new Greedy(0.002) };
+                var searchers = new[] { new Greedy(10000.0) };
 
                 while (!server.IsListening) Thread.Sleep(10);
                 
@@ -72,7 +72,7 @@ namespace ProgComp2013
                         foreach (var searcher in searchers) {
                             for (int i = 0; i < passes; ++i) {
                                 var route = searcher.Search(map, Map.Width * Map.Height);
-                                var score = route.CalculateScore(map);
+                                var score = route.CalculateScore(map); 
 
                                 if (score > bestScore) {
                                     Console.ForegroundColor = ConsoleColor.Yellow;
