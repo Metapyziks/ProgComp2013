@@ -90,21 +90,11 @@ namespace ProgComp2013.Searchers
                 return Direction.None;
             }
 
-            dirs = dirs
-                .Select(x => Tuple.Create(x.Item1, Math.Pow(Math.E, x.Item2 * Map.Width * Map.Height * 4.0)))
-                .ToList();
+            while (dirs.Count > 1 && _rand.NextDouble() < _error) {
+                dirs.RemoveAt(0);
+            }
 
-            var sum = dirs.Sum(x => x.Item2);
-            dirs = dirs
-                .Select(x => Tuple.Create(x.Item1, x.Item2 / sum))
-                .ToList();
-
-            var index = _rand.NextDouble();
-
-            sum = 0.0;
-            return dirs
-                .First(x => (sum += x.Item2) >= index)
-                .Item1;
+            return dirs.First().Item1;
         }
 
         public override string GetName()
