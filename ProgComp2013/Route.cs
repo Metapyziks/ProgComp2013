@@ -99,9 +99,9 @@ namespace ProgComp2013
         /// </summary>
         /// <param name="map">The map to evaluate the route on.</param>
         /// <returns>A score between 0.0 and 1.0.</returns>
-        public double CalculateScore(Map map)
+        public double CalculateScore(Map map, Point start)
         {
-            var agent = new Agent(map, this);
+            var agent = new Agent(map, this, start);
             double score = 0.0;
             int moves = 0;
 
@@ -117,11 +117,11 @@ namespace ProgComp2013
         /// Generates an image representing this route.
         /// </summary>
         /// <returns>An image generated from this route.</returns>
-        public Image ToImage(Map map)
+        public Image ToImage(Map map, Point start)
         {
             var bmp = new Bitmap(Map.Width * 3, Map.Height * 3);
             using (var ctx = Graphics.FromImage(bmp)) {
-                var agent = new Agent(map, this);
+                var agent = new Agent(map, this, start);
                 var initClr = Color.Red;
                 var finlClr = Color.Green;
 

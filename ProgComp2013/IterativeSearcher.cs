@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace ProgComp2013
 {
@@ -39,9 +40,9 @@ namespace ProgComp2013
         /// <param name="map">Map to traverse.</param>
         /// <param name="maxLength">Maximum number of steps to take.</param>
         /// <returns>A route that traverses the given map.</returns>
-        public Route Search(Map map, int maxLength = Map.Width * Map.Height)
+        public Route Search(Map map, Point start, int maxLength = Map.Width * Map.Height)
         {
-            _agent = new Agent(map, Enumerator(map));
+            _agent = new Agent(map, Enumerator(map), start);
 
             OnBegin();
 

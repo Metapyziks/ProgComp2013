@@ -43,8 +43,8 @@ namespace ProgComp2013
         /// </summary>
         /// <param name="map">Map to traverse.</param>
         /// <param name="dirs">Route to follow.</param>
-        public Agent(Map map, IEnumerable<Direction> dirs)
-            : this(map, dirs.GetEnumerator()) { }
+        public Agent(Map map, IEnumerable<Direction> dirs, Point start = default(Point))
+            : this(map, dirs.GetEnumerator(), start) { }
         
         /// <summary>
         /// Creates a new agent that follows the specified route
@@ -52,13 +52,13 @@ namespace ProgComp2013
         /// </summary>
         /// <param name="map">Map to traverse.</param>
         /// <param name="dirIter">Next direction selection enumerator.</param>
-        public Agent(Map map, IEnumerator<Direction> dirIter)
+        public Agent(Map map, IEnumerator<Direction> dirIter, Point start = default(Point))
         {
             _dirs = dirIter;
             WorkingMap = map.Clone();
 
-            X = 0;
-            Y = 0;
+            X = start.X;
+            Y = start.Y;
 
             Score = 0.0;
         }
@@ -85,7 +85,11 @@ namespace ProgComp2013
 
             Score += WorkingMap[X, Y];
 
-            WorkingMap[X, Y] = 0.0;
+            if (Program.Exercise == 2) {
+                WorkingMap[X, Y] *= 0.2;
+            } else {
+                WorkingMap[X, Y] = 0;
+            }
         }
 
         /// <summary>

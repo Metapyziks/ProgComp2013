@@ -5,6 +5,10 @@ using System.Linq;
 
 namespace ProgComp2013.Searchers
 {
+    /// <summary>
+    /// Not entirely greedy, uses some aspects from Greedy,
+    /// RegionSearch and RandomWalk.
+    /// </summary>
     public class Greedy : IterativeSearcher
     {
         private Random _rand = new Random();
