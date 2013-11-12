@@ -114,7 +114,7 @@ namespace ProgComp2013
                         int passes = 10;
                         foreach (var searcher in searchers) {
                             for (int i = 0; i < passes; ++i) {
-                                var route = searcher.Search(map, startPoints[name], Map.Width * Map.Height);
+                                var route = searcher.Search(map, startPoints[name], Map.Width * Map.Height * 2);
                                 var score = route.CalculateScore(map, startPoints[name]);
 
                                 if (score > bestScore) {
